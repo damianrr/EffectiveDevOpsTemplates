@@ -1,6 +1,9 @@
 from troposphere import Base64, ec2, GetAtt, Join, Output, Parameter, Ref, Template
+from ipaddress import ip_network
+from ipify import get_ip
 
 ApplicationPort = 3000
+PublicCidrIp = str(ip_network(get_ip()))
 
 t = Template()
 t.add_description("Effective AWS Hello World app")
@@ -20,7 +23,10 @@ t.add_resource(
         GroupDescription="Allow SSH and TCP/{} access".format(ApplicationPort),
         SecurityGroupIngress=[
             ec2.SecurityGroupRule(
-                IpProtocol="tcp", FromPort=22, ToPort="22", CidrIp="0.0.0.0/0"
+                IpProtocol="tcp",
+                FromPort=22,
+                ToPort="22",
+                CidrIp=PublicCidrIp
             ),
             ec2.SecurityGroupRule(
                 IpProtocol="tcp",
